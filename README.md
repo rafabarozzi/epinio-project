@@ -19,7 +19,7 @@ This project is divided into three parts.
 ```
 # Create Cluster
 eksctl create cluster --name=ekslab1 \
-                      --version=1.24s \
+                      --version=1.24 \
                       --region=us-east-1 \
                       --zones=us-east-1a,us-east-1b \
                       --without-nodegroup 
