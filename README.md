@@ -61,7 +61,7 @@ create nodegroup --cluster=ekslab1 \
 # Get List of nodes
 kubectl get nodes                         
 ```
-### Step-03: Create EBS CSI Drive
+### Step-04: Create EBS CSI Drive
 
 - Since EKS v1.23 it is necessary to configure and install an out-of-tree AWS EBS CSI driver as an addon into your EKS cluster. Please refer to this EKS documentation for more details.
 
@@ -70,33 +70,40 @@ Create the policy to attach in our nodes:
 aws iam create-policy --policy-name Amazon_EBS_CSI_Driver --policy-document file://Amazon_EBS_CSI_Driver.json
 ```
 
-### From output check arn:
+- From output check arn:
+```
 "Arn": "arn:aws:iam::410334805876:policy/Amazon_EBS_CSI_Driver"
+```
 
-### Get Worker node IAM Role ARN
+- Get Worker node IAM Role ARN
+```
 kubectl -n kube-system describe configmap aws-auth
+```
 
-### From output check rolearn
+- From output check rolearn
+```
 rolearn: arn:aws:iam::410334805876:role/eksctl-eksepinio1-nodegroup-eksep-NodeInstanceRole-190V592LWZLCU
 
-```
-In this case the name of role is:
+# In this case the name of role is:
 eksctl-eksepinio1-nodegroup-eksep-NodeInstanceRole-190V592LWZLCU
 ```
 
-#### Associate the policy to that role
+- Associate the policy to that role
 
 ```
 aws iam attach-role-policy --policy-arn arn:aws:iam::410334805876:policy/Amazon_EBS_CSI_Driver --role-name eksctl-eksepinio1-nodegroup-eksep-NodeInstanceRole-190V592LWZLCU
 ```
 ### Deploy Amazon EBS CSI Driver  
+
 - Verify kubectl version, it should be 1.14 or later
 ```
 kubectl version --client --short
 ```
 - Deploy Amazon EBS CSI Driver
+
 ```
 # Deploy EBS CSI Driver
+
 kubectl apply -k "github.com/kubernetes-sigs/aws-ebs-csi-driver/deploy/kubernetes/overlays/stable/?ref=master"
 
 # Verify ebs-csi pods running
@@ -105,7 +112,7 @@ kubectl get pods -n kube-system
 
 ### Step-05: Allow the pulling of Epinio's app container images from its internal HTTP registry
 
-Since EKS v1.24 it is necessary to explicitly allow the pulling of Epinio's app container images from its internal HTTP registry, due to the removal of dockershim CRI support and its replacement by containerd, which supports only trusted HTTPS registries by default.
+- Since EKS v1.24 it is necessary to explicitly allow the pulling of Epinio's app container images from its internal HTTP registry, due to the removal of dockershim CRI support and its replacement by containerd, which supports only trusted HTTPS registries by default.
 
 ```
 kubectl apply -f 01-Epinio-Images/
@@ -121,9 +128,11 @@ helm install cert-manager --namespace cert-manager --create-namespace jetstack/c
 
 ### Step-07: Install Nginx Ingress Controller
 
+```
 helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
 helm repo update
 helm upgrade --install nginx ingress-nginx/ingress-nginx --namespace nginx --create-namespace --set controller.ingressClassResource.default=true
+```
 
 ### Step-08: Create a CNAME DNS entry pointing to ELB endpoint
 
@@ -172,7 +181,9 @@ aws route53 change-resource-record-sets --hosted-zone-id <YOUR_ZONE_ID> --change
 ```
 
 ### Step-09: Install Epinio on the Cluster
+```
 helm upgrade --install epinio epinio/epinio --namespace epinio --create-namespace --set global.domain=example.com --set global.tlsIssuer=letsencrypt-production --set global.tlsIssuerEmail=email@example.com
+```
 
 
 # 2 - Deploying a simple application that uses postgreSQL as a backend
@@ -185,32 +196,35 @@ The first step of this documentation requires rails to be installed to create th
 ```
 EDITOR=vi rails credentials:edit
 ```
-To overcome this step it is necessary to have ruby 3.2.2 and rails installed and configured in your operating system.
+
+### To overcome this step it is necessary to have ruby 3.2.2 and rails installed and configured in your operating system.
 
 Here is a how to for CentOS 9:
 
-### Enable EPEL Release:
+- Enable EPEL Release:
 ```
 sudo dnf config-manager --set-enabled crb
 sudo dnf install epel-release epel-next-release
 ```
-### Install Dependencies
+
+- Install Dependencies
 ```
 sudo yum install gcc make git-core zlib zlib-devel gcc-c++ patch readline readline-devel libyaml-devel libffi-devel openssl-devel make bzip2 autoconf automake libtool bison curl sqlite-devel -y
 ```
-### Install Node.js to make use of Ruby on Rails LTS
+
+- Install Node.js to make use of Ruby on Rails LTS
 ```
 curl -sL https://rpm.nodesource.com/setup_14.x | sudo bash -
 sudo dnf install -y nodejs
 ```
 
-### Install Yarn Package required by Ruby on Rails source components.
+- Install Yarn Package required by Ruby on Rails source components.
 ```
 curl -sL https://dl.yarnpkg.com/rpm/yarn.repo | sudo tee /etc/yum.repos.d/yarn.repo
 sudo dnf install -y yarn
 ```
 
-### Install rbenv
+- Install rbenv
 ```
 git clone https://github.com/rbenv/rbenv.git ~/.rbenv
 echo 'export PATH="$HOME/.rbenv/bin:$PATH"' >> ~/.bashrc
@@ -223,24 +237,36 @@ exec $SHELL
 
 Verify that rbenv is set up correctly.
 curl -fsSL https://github.com/rbenv/rbenv-installer/raw/main/bin/rbenv-doctor | bash
-
-rbenv install 3.2.2
-gem install bundler
 ```
 
-### Clone the project 
+- Install ruby
+```
+sudo rbenv install 3.2.2
+```
+
+- Install bundles
+```
+sudo gem install bundler
+```
+
+- Install rails
+```
+sudo gem install rails
+```
+
+- Clone the project 
 
 ```
 git clone https://github.com/epinio/example-rails.git
 ```
 
-### Install the bundle
+- Install the bundle
 ```
-Dependences:
+# Dependences:
 sudo dnf install postgresql-devel
 sudo gem install pg
 
-cd# example-rails
+cd example-rails
 
 sudo bundle install
 ```
@@ -256,7 +282,7 @@ epinio version
 epinio login -u admin https://yourcluster.yourdomain.com
 
 ```
-## From this point you can follow the documentation described in https://github.com/epinio/example-rails
+From this point you can follow the documentation described in https://github.com/epinio/example-rails
 
 # 3 - Deleting the Lab
 
