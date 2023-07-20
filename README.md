@@ -72,7 +72,7 @@ aws iam create-policy --policy-name Amazon_EBS_CSI_Driver --policy-document file
 
 - From output check arn:
 ```
-"Arn": "arn:aws:iam::410334805876:policy/Amazon_EBS_CSI_Driver"
+"Arn": "arn:aws:iam::0000000000000:policy/Amazon_EBS_CSI_Driver"
 ```
 
 - Get Worker node IAM Role ARN
@@ -82,16 +82,16 @@ kubectl -n kube-system describe configmap aws-auth
 
 - From output check rolearn
 ```
-rolearn: arn:aws:iam::410334805876:role/eksctl-eksepinio1-nodegroup-eksep-NodeInstanceRole-190V592LWZLCU
+rolearn: arn:aws:iam::00000000000000:role/eksctl-eksepinio1-nodegroup-eksep-NodeInstanceRole-0000000000000
 
 # In this case the name of role is:
-eksctl-eksepinio1-nodegroup-eksep-NodeInstanceRole-190V592LWZLCU
+eksctl-eksepinio1-nodegroup-eksep-NodeInstanceRole-000000000000
 ```
 
 - Associate the policy to that role
 
 ```
-aws iam attach-role-policy --policy-arn arn:aws:iam::410334805876:policy/Amazon_EBS_CSI_Driver --role-name eksctl-eksepinio1-nodegroup-eksep-NodeInstanceRole-190V592LWZLCU
+aws iam attach-role-policy --policy-arn arn:aws:iam::00000000000:policy/Amazon_EBS_CSI_Driver --role-name eksctl-eksepinio1-nodegroup-eksep-NodeInstanceRole-00000000000
 ```
 ### Deploy Amazon EBS CSI Driver  
 
@@ -303,9 +303,9 @@ aws iam list-policies --query "Policies[?PolicyName=='Amazon_EBS_CSI_Driver'].Ar
 kubectl -n kube-system describe configmap aws-auth
 
 #Detach the policy
-aws iam detach-role-policy --policy-arn arn:aws:iam::410334805876:policy/Amazon_EBS_CSI_Driver --role-name eksctl-eksepinio1-nodegroup-eksde-NodeInstanceRole-8EBAJEZX667H
+aws iam detach-role-policy --policy-arn arn:aws:iam::0000000000000000:policy/Amazon_EBS_CSI_Driver --role-name eksctl-eksepinio1-nodegroup-eksde-NodeInstanceRole-8EXXXXXXXXXX
 
-aws iam delete-policy --policy-arn arn:aws:iam::410334805876:policy/Amazon_EBS_CSI_Driver
+aws iam delete-policy --policy-arn arn:aws:iam::000000000000:policy/Amazon_EBS_CSI_Driver
 ```
 
 ## Step-03: Delete the Node Group
