@@ -296,8 +296,14 @@ kubectl delete deployment ebs-csi-controller -n kube-system
 ```
 ### Step-02: Remove IAM policy the packages
 ```
-aws iam detach-role-policy --policy-arn arn:aws:iam::410334805876:policy/Amazon_EBS_CSI_Driver --role-name 
-eksctl-eksepinio1-nodegroup-eksde-NodeInstanceRole-8EBAJEZX667H
+#Get Policy ARN
+aws iam list-policies --query "Policies[?PolicyName=='Amazon_EBS_CSI_Driver'].Arn" --output text
+
+#Get the Role Name
+kubectl -n kube-system describe configmap aws-auth
+
+#Detach the policy
+aws iam detach-role-policy --policy-arn arn:aws:iam::410334805876:policy/Amazon_EBS_CSI_Driver --role-name eksctl-eksepinio1-nodegroup-eksde-NodeInstanceRole-8EBAJEZX667H
 
 aws iam delete-policy --policy-arn arn:aws:iam::410334805876:policy/Amazon_EBS_CSI_Driver
 ```
@@ -325,5 +331,5 @@ eksctl delete nodegroup --cluster=ekslab1 --name=ekslab1-ng-private1
 ### Delete Cluster
 ```
 eksctl delete cluster <clusterName>
-eksctl delete cluster ekslab11
+eksctl delete cluster ekslab1
 ```
